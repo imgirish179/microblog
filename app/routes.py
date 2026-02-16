@@ -1,5 +1,6 @@
-from flask import render_template
+from flask import flash, redirect, render_template, url_for
 from app import app
+from app.forms import MyForm
 
 @app.route('/')
 @app.route('/index')
@@ -22,15 +23,32 @@ def home():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('index.html', title='Dashboard', user={'username': 'Guest'})
+    return render_template('index.html', title="Dashboards", user={'username': 'Guest'}, tests="TesTS")
 
-@app.route('/helloworld')
-def about():
-    return 12
+@app.route('/posts')
+def posts():
+    user = {'username': 'Guest'}
+    posts = [
+        {
+            'author': {'username': 'John'},
+            'body': 'Beautiful day in Portland!'
+        },
+        {
+            'author': {'username': 'Susan'},
+            'body': 'The Avengers movie was so cool!'
+        }
+    ]
+    return render_template('posts.html', title='Posts', user=user, posts=posts)
 
-@app.route('/')
+@app.route('/contact')
 def contact():
-    return "Contact Page"
+    return render_template('contact.html', title='Contact')
 
-
-
+@app.route('/testform', methods=['GET', 'POST'])
+def testform():
+    form = MyForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        flash('Form submitted successfully! Name: {}'.format(name))
+        # return redirect(url_for('contact', title='Contact'))
+    return render_template('form.html', title='Test Form', form=form)
